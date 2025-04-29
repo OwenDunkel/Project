@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +96,43 @@ namespace AutomaticWordComplete
             FindWords(prefixNode, prefix, results);
             return results;
         }
+
+
+
+
+        // Deletes word from the Trie
+        public void Delete(string word)
+        {
+            DeleteRecursive(root, word, 0);
+        }
+
+        // Helper method for recursive deletion from Trie
+        private bool DeleteRecursive(TrieNode node, string word, int index)
+        {
+            if (index == word.Length)
+            {
+                // If we reached the end of the word, mark it as not a valid word
+                if (!node.IsEndOfWord) return false; // Word doesn't exist
+
+                node.IsEndOfWord = false;
+                return node.Children.Count == 0; // If node has no children, it's safe to delete
+            }
+
+            char ch = word[index];
+            if (!node.Children.ContainsKey(ch)) return false; // Word doesn't exist
+
+            bool shouldDeleteCurrentNode = DeleteRecursive(node.Children[ch], word, index + 1);
+
+            // If child node can be deleted, remove it
+            if (shouldDeleteCurrentNode)
+            {
+                node.Children.Remove(ch);
+                return node.Children.Count == 0 && !node.IsEndOfWord;
+            }
+
+            return false;
+        }
+
 
     }
 
